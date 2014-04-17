@@ -84,9 +84,9 @@ void format_amount(amount_t *a,char *result,unsigned long *length,bool debug){
 		*length=gmp_snprintf(result,a->max_length,"0.%0*s",m-len+1,a->buf);
 	}else{
 		// greater than one
-		*length=gmp_snprintf(result,a->max_length,"%.*s.%.*s",len-m,a->buf,m,a->buf+len-m);
+		*length=gmp_snprintf(result,a->max_length,"%.*s.%.*s",len-n,a->buf,n,a->buf+len-n);
 	}
 	if (debug){
-		*length=gmp_snprintf(result,a->max_length,"%s %Qu",result,a->sum);
+		*length=gmp_snprintf(result,a->max_length,"%s %d %d %d %Qu",result,m,n,len,a->sum);
 	}
 }
