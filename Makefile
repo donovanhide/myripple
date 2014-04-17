@@ -6,7 +6,6 @@ CFLAGS=-Wall -std=c99 -m64 -O2 `mysql_config --include` -c
 LD=ld 
 LDFLAGS=-dylib -lgmp -lc
 
-
 #Things you shouldn't need to change if you just mean to build this
 SOURCES=amount.c myripple.c
 OBJECTS=$(SOURCES:.c=.o)
