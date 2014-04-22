@@ -21,6 +21,6 @@ void free_amount(amount_t *a);
 void set_amount(amount_t *a,const char *b);
 void add_amount(amount_t *a,const char *b);
 void clear_amount(amount_t *a);
-void format_amount(amount_t *a,char *result,unsigned long *length,bool debug);
+void format_amount(amount_t *a,char *result,unsigned long *length);
 
 #endif  // AMOUNT_H_

@@ -22,6 +22,9 @@ $(BINARY): $(OBJECTS)
 install: $(BINARY)
 	cp $(BINARY) $(MYSQL_PLUGIN_DIR)
 
+check:
+	mysql -t < test.sql
+
 tidy:
 	uncrustify -c ./uncrustify.cfg --no-backup --replace $(SOURCES)
 

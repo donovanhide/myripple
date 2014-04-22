@@ -61,32 +61,47 @@ void clear_amount(amount_t *a){
 	mpq_set_ui(a->sum,0,1);
 }
 
-void format_amount(amount_t *a,char *result,unsigned long *length,bool debug){
+// Thanks to Paul Zimmerman, David Gillies and Marco Bodrato 
+// on the GMP mailing list for help on this.
+void format_amount(amount_t *a,char *result,unsigned long *length){
 	mpq_canonicalize(a->sum);
-	mpz_set_ui(a->factor,5);
 	mpq_get_num(a->num,a->sum);
 	mpq_get_den(a->den,a->sum);
+	if (mpz_cmp_ui(a->den,1)==0){
+		// Integral
+		mpz_get_str(result,10,a->num);
+		*length=strlen(result);
+		return;
+	}
+	bool negative=(mpz_sgn(a->num)==-1);
+	mpz_abs(a->num,a->num);
+	bool greater_than_one=false;
+	if (mpz_cmp(a->num,a->den)>0){
+		greater_than_one=true;
+	}
 	mp_bitcnt_t m = mpz_scan1(a->den,0);
+	mpz_set_ui(a->factor,5); 
 	mp_bitcnt_t n = mpz_remove(a->den,a->den,a->factor);
+	// Or
+	// size_t n = mpz_sizeinbase (a->den, 2) - m;
+	// n = ((n + 1) * 3 + n / 68) / 7;
 	if (m>n){
 		mpz_ui_pow_ui(a->factor,5,m-n);
 		mpz_mul(a->num,a->num,a->factor);
 	}else{
 		mpz_mul_2exp(a->num,a->num,n-m);
 	}
-	mpz_get_str(a->buf, 10, a->num);
-	size_t len = strlen(a->buf);
-	if (m==0){
-		// integral
-		*length=gmp_snprintf(result,a->max_length,"%s",a->buf);
-	}else if (m>=len){
-		// less than one
-		*length=gmp_snprintf(result,a->max_length,"0.%0*s",m-len+1,a->buf);
-	}else{
+	if (greater_than_one){
 		// greater than one
-		*length=gmp_snprintf(result,a->max_length,"%.*s.%.*s",len-n,a->buf,n,a->buf+len-n);
-	}
-	if (debug){
-		*length=gmp_snprintf(result,a->max_length,"%s %d %d %d %Qu",result,m,n,len,a->sum);
+		mpz_get_str(a->buf,10,a->num);
+		size_t len=strlen(a->buf);
+		size_t offset=(m>n)?len-m:len-n;
+		char *fmt=negative?"-%.*s.%s":"%.*s.%s";
+		*length=gmp_snprintf(result,a->max_length,fmt,offset,a->buf,a->buf+offset);
+	}else{
+		// less than one
+		size_t offset=(m>n)?m:n;
+		char *fmt=negative?"-0.%0*Zu":"0.%0*Zu";
+		*length=gmp_snprintf(result,a->max_length,fmt,offset,a->num);
 	}
 }

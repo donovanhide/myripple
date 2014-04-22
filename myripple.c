@@ -9,14 +9,11 @@ const int MAX_LENGTH=255;
 
 // reusable functions
 my_bool init(UDF_INIT *initid, UDF_ARGS *args, char *msg,char *usage){
-	if (args->arg_count!=1 && args->arg_count!=2){
+	if (args->arg_count!=1){
 		strcpy(msg,usage);
 		return 1;
 	}
 	args->arg_type[0] = STRING_RESULT;
-	if (args->arg_count==2){
-		args->arg_type[1] = INT_RESULT;
-	}
 	initid->max_length=MAX_LENGTH;
 	amount_t *amount=new_amount(MAX_LENGTH);
 	if (amount==NULL){
@@ -34,17 +31,13 @@ my_bool de_init(UDF_INIT *initid){
 
 char* output(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,my_bool *is_null,my_bool *error){
 	amount_t* amount=(amount_t*)initid->ptr;
-	bool debug=false;
-	if (args->arg_count==2){
-		debug=*((long long*)args->args[1])>0;
-	}
-	format_amount(amount,result,length,debug);
+	format_amount(amount,result,length);
 	return result;
 }
 
 // SQL UDF definitions
 my_bool amount_init(UDF_INIT *initid, UDF_ARGS *args, char *msg){
-	return init(initid,args,msg,"amount(8 bytes of amount,[debug int])");
+	return init(initid,args,msg,"amount(8 bytes of amount");
 }
 
 my_bool amount_deinit(UDF_INIT *initid){
@@ -58,7 +51,7 @@ char* amount(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *leng
 }
 
 my_bool sum_amount_init(UDF_INIT *initid, UDF_ARGS *args, char *msg){
-	return init(initid,args,msg,"sum_amount(8 bytes of amount,[debug int])");
+	return init(initid,args,msg,"sum_amount(8 bytes of amount)");
 }
 
 my_bool sum_amount_deinit(UDF_INIT *initid){
