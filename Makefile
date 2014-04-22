@@ -4,7 +4,7 @@ MYSQL_PLUGIN_DIR=`mysql_config --plugindir`
 CC=gcc
 CFLAGS=-Wall -std=c99 -m64 -O2 `mysql_config --include` -c 
 LD=ld 
-LDFLAGS=-dylib -lgmp -lc
+LDFLAGS=-shared -lgmp -lc
 
 #Things you shouldn't need to change if you just mean to build this
 SOURCES=amount.c myripple.c
