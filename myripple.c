@@ -45,6 +45,11 @@ my_bool amount_deinit(UDF_INIT *initid){
 }
 
 char* amount(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length,my_bool *is_null,my_bool *error){
+	if (args->args[0]==NULL){
+		*is_null = 1;
+		*length = 0;
+		return NULL;
+	}
 	amount_t* amount=(amount_t*)initid->ptr;
 	set_amount(amount,args->args[0]);
 	return output(initid,args,result,length,is_null,error);
@@ -64,6 +69,10 @@ void sum_amount_clear(UDF_INIT *initid, char *is_null, char *error){
 }
 
 void sum_amount_add(UDF_INIT *initid, UDF_ARGS *args,char *is_null, char *error){
+	if (args->args[0]==NULL){
+		*is_null = 1;
+		return;
+	}
 	amount_t* amount=(amount_t*)initid->ptr;
 	add_amount(amount,args->args[0]);
 }
